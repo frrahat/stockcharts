@@ -116,7 +116,9 @@ def get_historical_prices(symbol, start_date, end_date):
     ;
     Returns a nested list.
     """
-    url = 'http://ichart.yahoo.com/table.csv?s=%s&' % symbol + \
+    #https://www.google.com/finance/historical?output=csv&q=MSFT&d=9&e=3&f=2017&g=d&a=6&b=1&c=2016&ignore=.csv
+    # url = 'http://ichart.yahoo.com/table.csv?s=%s&' % symbol + \
+    url = 'https://www.google.com/finance/historical?output=csv&q=%s&' % symbol + \
           'd=%s&' % str(int(end_date[4:6]) - 1) + \
           'e=%s&' % str(int(end_date[6:8])) + \
           'f=%s&' % str(int(end_date[0:4])) + \
@@ -125,7 +127,9 @@ def get_historical_prices(symbol, start_date, end_date):
           'b=%s&' % str(int(start_date[6:8])) + \
           'c=%s&' % str(int(start_date[0:4])) + \
           'ignore=.csv'
+    print 'url : '+url
     days = urllib.urlopen(url).readlines()
+    
     data = [day[:-2].split(',') for day in days]
     return data
 

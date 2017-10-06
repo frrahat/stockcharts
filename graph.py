@@ -8,11 +8,13 @@ import time
 import datetime
 import math
 import re
-from pylab import *
+# from pylab import *
 import numpy as np
-from termcolor import colored
+# from termcolor import colored
 import urllib2
 from classes.html import *
+import matplotlib.pyplot as plt
+from matplotlib.ticker import MultipleLocator
 
 """
 sample usage:
@@ -89,6 +91,8 @@ def addavgHighandLow():
     start =1 # First row[0] is the header column 
     while (start+numberOfDays)<len(data):
         datseg = data[start:(start+numberOfDays)]
+        print(data[start])
+        data[start].append(0)
         data[start].append(averagehigh(datseg)) 
         data[start].append(averagelow(datseg)) 
         # data[start].append(averagelow(datseg))
@@ -119,7 +123,10 @@ def printData():
             #     str(row[7]), str(row[8]), str(row[6]), str(row[5]), str(row[9]))
             weekday = '2010-01-12'
             if "Date" not in row[0]:
-                weekday = datetime.datetime.strptime(row[0], '%Y-%m-%d').strftime('%A') 
+                try:
+                    weekday = datetime.datetime.strptime(row[0], '%Y-%m-%d').strftime('%A') 
+                except:
+                    weekday = "foo"
            
             print "{0:^10} {1:>10} {2:>10} {3:>10} {4:>10} {5:>10} {6:>10} {7:15}".\
                 format(str(row[0]), str(row[1]), str(row[3]),str(row[2]),str(row[4]),\
@@ -202,19 +209,21 @@ def drawPlot(plotdata,ticker):
     sortedlow = sorted (low, reverse = True)
     data = np.vstack([sortedlow,sortedhigh]).T
     plt.hist(data,50, alpha=0.7, label = ['low', 'high'])
-    plt. legend(loc = 'upper right')
-    show()
+    plt.legend(loc = 'upper right')
+    plt.show()
 
 def main ():  
     if (internet_on()==True):
 
         print "Parsing data from the net..."
         html1  = html("test")
-        html1.getHeader(test)
+        html1.getHeader("foo")
 
-        #     addavgHighandLow()
-        #     printData()
-        #     drawPlot(data, ticker)
+        filldata("MSFT")
+        addavgHighandLow()
+        printData()
+        ticker="foo"
+        drawPlot(data, ticker)
     else: 
         print "No Internet Connection"
 
