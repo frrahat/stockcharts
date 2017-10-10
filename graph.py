@@ -48,22 +48,25 @@ def filldata(stock_symbol):
     global data
    # Get historical data 
     data = ystockquote.get_historical_prices(stock_symbol,fromDate,today)
-    #Adding Extra Columns header in row header
-    data[0].extend(["Average High", "Average Low", "Action", "Weekday"]) 
     """
     During the day time if we run this above query it does not work welll. 
     We need to insert the data manually Updating the list with todays Data
     """
-    # if (time.strftime("%Y-%m-%d") not in data[1][0]):
-    #     today_data= get_all(stock_symbol) #  This is retrive only today's price
-    #     data.insert(1,[])
-    #     data[1].append(time.strftime("%Y-%m-%d"))
-    #     data[1].append(today_data['open'])
-    #     data[1].append(today_data['days_high'])
-    #     data[1].append(today_data['days_low'])
-    #     data[1].append(today_data['last_price'])
-    #     data[1].append(today_data['volume'])
-    #     data[1].append(today_data['adj_close'])
+    #Date,Open,High,Low,Close,Volume,Average High,Average Low,Action,WeekDay
+    if (time.strftime("%d-%b-%y") not in data[1][0]):
+        print('getting todays data')
+        today_data= ystockquote.get_all(stock_symbol) #  This is retrive only today's price
+        data.insert(1,[])
+        data[1].append(time.strftime("%d-%b-%y"))
+        data[1].append(today_data['today_open'].replace('N/A',data[2][1]))
+        data[1].append(today_data['todays_high'].replace('N/A',data[2][2]))
+        data[1].append(today_data['todays_low'].replace('N/A',data[2][3]))
+        data[1].append(today_data['previous_close'].replace('N/A',data[2][4]))
+        data[1].append(today_data['volume'].replace('"NMS"',data[2][5]))
+        # last_trade_price=today_data['last_trade_price']
+        # k1=last_trade_price.find('<b>')
+        # k2=last_trade_price.find('</b>')
+        # data[1].append(last_trade_price[k1+3:k2])
         
 #Calculating Average High of the array average 
 def averagehigh(dataseg):
@@ -88,21 +91,31 @@ def addavgHighandLow():
     # Start days is the first day
     global data
     start =1 # First row[0] is the header column 
+    #Adding Extra Columns header in row header
+    # Date,Open,High,Low,Close,Volume,Average High,Average Low,Action
+    data[0].extend(["Average High", "Average Low", "Action"]) 
     n=len(data)
     while (start)<n:
         datseg = data[start:min((start+numberOfDays),n)]
         # print(data[start])
-        data[start].append(0)
         data[start].append(averagehigh(datseg)) 
         data[start].append(averagelow(datseg)) 
         # data[start].append(averagelow(datseg))
-        if float(data[start][3]) > float(data[start][7]):
+        if float(data[start][3]) > float(data[start][6]):
             data[start].append("BULL")
-        elif float(data[start][2]) < float(data[start][8]): 
+        elif float(data[start][2]) < float(data[start][7]): 
             data[start].append("BEAR")  
         else:
             data[start].append("----")
         start +=1
+
+def addWeekDays():
+    global data
+    data[0].append("Weekday")
+    n=len(data)
+    for i in range(1,n):
+        weekday=datetime.datetime.strptime(data[i][0], '%d-%b-%y').strftime('%A')
+        data[i].append(weekday)
 
 def printData():
     global data
@@ -114,7 +127,7 @@ def printData():
         for i in range(n):
             item=row[i]
             print(item,end=" ")
-            padding=10-len(item)
+            padding=10-len(str(item))
             if(padding>0 and i<n-1):
                 print(" "*padding,end="")
         print()
@@ -122,16 +135,17 @@ def printData():
 # Drawing the plot
 def drawPlot(ticker):
     global data
+    #Date,Open,High,Low,Close,Volume,Average High,Average Low,Action,WeekDay
     array=np.array(data)[::-1]
 
     high = array[:-1,2].astype(float)
     low = array[:-1,3].astype(float)
-    avghigh = array[:-1,7].astype(float)
-    avglow = array[:-1,8].astype(float)
+    avghigh = array[:-1,6].astype(float)
+    avglow = array[:-1,7].astype(float)
     closing = array[:-1,4].astype(float)
     volume = array[:-1,5].astype(float)
     daysopen = array[:-1,1].astype(float)
-    marketvolume = array[:-1,5].astype(float)*array[:-1,3].astype(float)
+    marketvolume = volume*low
     x = [i for i in range(1,len(data))]  # value of X axis 
 
     
@@ -188,8 +202,9 @@ def main ():
     #     print "No Internet Connection"
     
     filldata("GOOG")
-    # printData()
     addavgHighandLow()
+    addWeekDays()
+    printData()
     drawPlot("foo")
 
 if __name__ == "__main__":
