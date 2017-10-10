@@ -123,42 +123,18 @@ def printData():
 def drawPlot(ticker):
     global data
     array=np.array(data)[::-1]
-    print(array[:,0])
-    high=array[:-1,2].astype(float)
-    low =array[:-1,3].astype(float)
-    avghigh=array[:-1,7].astype(float)
-    avglow =array[:-1,8].astype(float)
-    closing =array[:-1,4].astype(float)
+
+    high = array[:-1,2].astype(float)
+    low = array[:-1,3].astype(float)
+    avghigh = array[:-1,7].astype(float)
+    avglow = array[:-1,8].astype(float)
+    closing = array[:-1,4].astype(float)
     volume = array[:-1,5].astype(float)
     daysopen = array[:-1,1].astype(float)
-    marketvolume =array[:-1,5].astype(float)*array[:-1,3].astype(float)
+    marketvolume = array[:-1,5].astype(float)*array[:-1,3].astype(float)
     x = [i for i in range(1,len(data))]  # value of X axis 
-    # i =0;   # Number of Rows 
-    # for row in plotdata:
-    #     # Filling  high, low, avhigh and avlow array from the plotdata
-    #     # This can be done smartly slicing entired column from plotdata  
 
-    #     if len(row)>9 and ("Date" not in row[0]):
-    #         high.append(float (row[2]))
-    #         low.append(float (row[3]))
-    #         avghigh.append(float(row[7]))
-    #         avglow.append(float(row[8]))
-    #         closing.append(float(row[4]))
-    #         daysopen.append(float(row[1]))
-    #         volume.append(row[5])
-    #         marketvolume.append(int (row[5])* float(row[3]))
-    #         i+=1
-    #         x.append(i)
-
-   # Reversing the value so that most lastest value stays on the bottom because the graph need to put the lattest value on the right side of the graph
-    # high.reverse()
-    # low.reverse()
-    # avghigh.reverse()
-    # avglow.reverse()
-    # closing.reverse()
-    # daysopen.reverse()   
-    # volume.reverse()
-    # plt.close("all")
+    
 
 #Drawing the plot. 
     fig = plt.figure()
@@ -188,12 +164,11 @@ def drawPlot(ticker):
     # Making the second figure for the plot
     plt.figure(2)
    #Sorting the result because it does not  work well without sorting. I need to test it more  
-    # sortedhigh =sorted(high, reverse=True)
-    # sortedlow = sorted (low, reverse = True)
-    sortedhigh = high[::-1]
-    sortedlow = low[::-1]
-    data = np.vstack([sortedlow,sortedhigh]).T
-    plt.hist(data,50, alpha=0.7, label = ['low', 'high'])
+    sortedhigh =sorted(high, reverse=True)
+    sortedlow = sorted (low, reverse = True)
+    data_1 = np.vstack([sortedlow,sortedhigh]).T
+
+    plt.hist(data_1,50, alpha=0.7, label = ['low', 'high'])
     plt.legend(loc = 'upper right')
     plt.show()
 
